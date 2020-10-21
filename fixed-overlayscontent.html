@@ -19,7 +19,7 @@
         background-color: blue;
     }
     .bottom {
-        bottom: 0;
+        bottom: env(keyboard-inset-height, 0);
         background-color: green;
     }
     input[type=text] {
@@ -28,5 +28,8 @@
         padding: 10px; 
     }
 </style>
-<div class="top">TOP FIXED</div>
+<div class="top">TOP FIXED: virtual keyboard overlays content</div>
 <div class="bottom">BOTTOM FIXED <input type="text" placeholder="put focus here..."></div>
+<script>
+    navigator.virtualKeyboard.overlaysContent = true
+</script>
