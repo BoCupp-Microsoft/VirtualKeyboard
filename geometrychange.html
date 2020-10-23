@@ -5,7 +5,7 @@
         display: grid;
         width: calc(100vw - 16px);
         height: calc(100vh - 16px);
-        grid-template-rows: repeat(3, minmax(min-content, max-content)) 1fr
+        grid-template-rows: repeat(2, minmax(min-content, max-content)) 1fr
             calc(env(keyboard-inset-bottom) - env(keyboard-inset-top));
     }
     [contenteditable] {
@@ -15,13 +15,13 @@
         padding: 4px;
         outline: none;
 
-        overflow: auto;
+        overflow-y: scroll;
     }
     #toolbar {
         display: grid;
 
         grid-gap: 10px;
-        grid-template-columns: repeat(3, minmax(min-content, max-content));
+        grid-template-columns: repeat(5, minmax(min-content, max-content));
 
         background-color: #eee;
         border: 1px solid #ccc;
@@ -30,34 +30,22 @@
 
         padding: 4px;
     }
+    .separator {
+        border-left: 1px solid #777;
+        margin: 0 6px;
+    }
     h1 {
         font-family: sans-serif;
         margin: 10px 0;
     }
-    dl {
-        display: grid;
-        
-        grid-column-gap: 4px;
-        grid-template-columns: repeat(2, minmax(min-content, max-content));
-
-        font-family: sans-serif;
-    }
-    dt {
-        font-weight: bold;
-    }
-    dd {
-        margin: 0;
-    }
 </style>
 <h1>Editor</h1>
-<dl>
-    <dt>three-finger-tap:</dt>
-    <dd>show the virtual keyboard</dd>
-</dl>
 <div id="toolbar">
     <img src="./icons/content_cut-24px.svg" alt="cut">
     <img src="./icons/content_copy-24px.svg" alt="copy">
     <img src="./icons/content_paste-24px.svg" alt="paste">
+    <div class="separator"></div>
+    <img id="keyboard-toggle" src="./icons/keyboard-black-24dp.svg" alt="toggle keyboard">
 </div>
 <div virtualkeyboardpolicy="manual" contenteditable spellcheck="false">
     <p>
@@ -158,16 +146,38 @@
     </p>
 </div>
 <script type="module">
-    import GestureRecognizer from "./GestureRecognizer.js"
-
     let ce = document.querySelector("[contenteditable]")
-    let gr = new GestureRecognizer()
-    gr.watch(ce)
 
-    gr.addEventListener("threefingertap", e => {
+    let toggle = document.querySelector("#keyboard-toggle")
+    toggle.addEventListener("click", toggleKeyboard)
+    function toggleKeyboard() {
         ce.focus()
-        navigator.virtualKeyboard.show()
-    })
+
+        if (navigator.virtualKeyboard.boundingRect &&
+            navigator.virtualKeyboard.boundingRect.height > 0) {
+            navigator.virtualKeyboard.hide()
+        } else {
+            navigator.virtualKeyboard.show()
+        }
+    }
+
+    navigator.virtualKeyboard.addEventListener("geometrychange", handleGeometryChange)
+    function handleGeometryChange(e) {
+        let keyRect = navigator.virtualKeyboard.boundingRect
+        if (keyRect.height > 0) {
+            if (getSelection().rangeCount == 0) {
+                return
+            }
+            
+            let r = getSelection().getRangeAt(0)
+            let rect = r.getBoundingClientRect()
+
+            let delta = rect.bottom - keyRect.top
+            if (delta > 0) {
+                ce.scrollTop += delta + 40
+            }
+        }
+    }
 
     navigator.virtualKeyboard.overlaysContent = true
 </script>
