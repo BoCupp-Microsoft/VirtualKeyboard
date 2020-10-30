@@ -5,8 +5,8 @@
         display: grid;
         width: calc(100vw - 16px);
         height: calc(100vh - 16px);
-        grid-template-rows: repeat(2, minmax(min-content, max-content)) 1fr
-            calc(env(keyboard-inset-bottom) - env(keyboard-inset-top));
+        grid-template-rows: repeat(2, minmax(min-content, max-content)) 
+            1fr env(keyboard-inset-height);
     }
     [contenteditable] {
         border: 1px solid #ccc;
